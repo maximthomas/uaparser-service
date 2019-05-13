@@ -9,7 +9,7 @@ Run from sources
 
 Build and run docker image
 ```
-mvn install
+./mvnw install
 docker-compose up --build 
 ```
 
