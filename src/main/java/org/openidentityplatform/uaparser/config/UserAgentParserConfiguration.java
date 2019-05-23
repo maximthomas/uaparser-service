@@ -17,6 +17,8 @@
 package org.openidentityplatform.uaparser.config;
 
 import org.openidentityplatform.uaparser.CachedUserAgentStringParser;
+import org.openidentityplatform.uaparser.repository.DummyRepository;
+import org.openidentityplatform.uaparser.repository.UserAgentRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -26,6 +28,11 @@ public class UserAgentParserConfiguration {
     @Bean
     public CachedUserAgentStringParser cachedUserAgentStringParser() {
         return new CachedUserAgentStringParser();
+    }
+
+    @Bean
+    public UserAgentRepository userAgentRepository() {
+        return new DummyRepository();
     }
 
 }

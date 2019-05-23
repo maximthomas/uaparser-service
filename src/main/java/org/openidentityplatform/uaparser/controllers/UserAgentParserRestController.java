@@ -19,23 +19,36 @@ package org.openidentityplatform.uaparser.controllers;
 import net.sf.uadetector.ReadableUserAgent;
 import org.apache.commons.lang3.StringUtils;
 import org.openidentityplatform.uaparser.CachedUserAgentStringParser;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.openidentityplatform.uaparser.repository.UserAgentRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class UserAgentParserRestController {
 
-    private CachedUserAgentStringParser cachedUserAgentStringParser;
+    private static final Logger logger = LoggerFactory.getLogger(UserAgentParserRestController.class);
 
-    public UserAgentParserRestController(CachedUserAgentStringParser cachedUserAgentStringParser) {
+    private CachedUserAgentStringParser cachedUserAgentStringParser;
+    private UserAgentRepository userAgentRepository;
+
+    public UserAgentParserRestController(CachedUserAgentStringParser cachedUserAgentStringParser,
+                                         UserAgentRepository userAgentRepository) {
         this.cachedUserAgentStringParser = cachedUserAgentStringParser;
+        this.userAgentRepository = userAgentRepository;
     }
 
     @GetMapping("/")
     public ReadableUserAgent parse(@RequestParam(name = "user-agent", required = false) String userAgentParameter, @RequestHeader(name = "User-Agent") String userAgentHeader) {
         return cachedUserAgentStringParser.parse(StringUtils.isNotBlank(userAgentParameter) ? userAgentParameter : userAgentHeader);
+    }
+
+    @GetMapping("/store")
+    public ResponseEntity store(@RequestParam(name = "user-agent", required = false) String userAgentParameter, @RequestHeader(name = "User-Agent") String userAgentHeader) {
+        ReadableUserAgent userAgent = cachedUserAgentStringParser.parse(StringUtils.isNotBlank(userAgentParameter) ? userAgentParameter : userAgentHeader);
+        userAgentRepository.storeUserAgent(userAgent);
+        return ResponseEntity.ok().header("Access-Control-Allow-Origin", "*").build();
     }
 
 }
